@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descubre la Palabra - Inventos de Asia</title>
+    <style>
+        body {
+            font-family: "Arial", sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 600px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #8a4f24;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .word {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .message {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            color: #e74c3c;
+        }
+
+        .input-area {
+            margin-top: 20px;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 1.5rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+            width: 50px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 15px;
+            font-size: 1.2rem;
+            background-color: #8a4f24;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #7a3e1b;
+        }
+
+        .hint {
+            font-size: 1rem;
+            color: #2c3e50;
+            font-style: italic;
+            margin-top: 15px;
+        }
+
+        .reset-btn {
+            padding: 10px 20px;
+            background-color: #2c3e50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .reset-btn:hover {
+            background-color: #34495e;
+        }
+
+        img {
+            max-width: 100%; /* La imagen no puede exceder el 100% del ancho de su contenedor */
+            height: auto;    /* Mantiene la proporción de la imagen */
+            margin: 20px auto;  /* Centra la imagen con márgenes automáticos */
+            display: block; /* Asegura que la imagen se muestre como un bloque para centrarla */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #description {
+            display: none;
+            text-align: left;
+            margin-top: 20px;
+            margin-left: 50px;
+        }
+
+        #description h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        #description p {
+            font-size: 1rem;
+            color: #2c3e50;
+        }
+
+        #resultImage {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Descubre la Palabra - Inventos de Asia</h1>
+        <div id="word" class="word">_ _ _ _ _</div>
+        <div id="attempts" class="message">Intentos restantes: 6</div>
+        <div id="hint" class="hint">Pista: </div>
+        
+        <div class="input-area">
+            <input type="text" id="letterInput" maxlength="1" placeholder="Letra" />
+            <button onclick="guessLetter()">Adivinar</button>
+        </div>
+        <div id="message" class="message"></div>
+        <!-- Botón para cambiar a la siguiente palabra -->
+        <button class="reset-btn" onclick="nextWord()">Siguiente Palabra</button>
+ 
+    </div>
+    <div id="description">
+        <h3>Descripción del invento:</h3>
+        <p id="descriptionText"></p>
+        <img id="resultImage" src="" alt="Resultado del juego" />
+    </div>   
+
+    <script>
+        const words = {
+        "PAPEL": {
+            hints: ["Material utilizado para escribir.", "Proviene de China.", "Hecho de pulpa de madera."],
+            image: "images/papel.jpg",
+            description: "El papel es un material usado para escribir, imprimir o dibujar. Es un invento chino que revolucionó la forma de comunicar ideas."
+        },
+        "POLVORA": {
+            hints: ["Invento usado en fuegos artificiales.", "Explosivo de origen chino.", "Se usa en armas antiguas."],
+            image: "images/polvora.jpg",
+            description: "La pólvora es un compuesto explosivo utilizado en armas y fuegos artificiales. Fue inventada en China y cambió la guerra y la pirotecnia."
+        },
+        "COMPAS": {
+            hints: ["Herramienta para medir ángulos.", "Es importante en la navegación.", "Utilizado en matemáticas."],
+            image: "images/compas.jpg",
+            description: "El compás es una herramienta matemática usada para trazar círculos y medir distancias. Es esencial en geometría y navegación."
+        },
+        "IMPRENTA": {
+            hints: ["Invento para reproducir textos.", "Revolucionó la difusión del conocimiento.", "Creado en China."],
+            image: "images/imprenta.jpg",
+            description: "La imprenta permitió la reproducción en masa de textos, facilitando la difusión del conocimiento, y fue un invento de origen chino."
+        },
+        "PARAGUAS": {
+            hints: ["Protección contra la lluvia.", "Es común en Japón.", "Tiene una versión plegable."],
+            image: "images/paraguas.jpg",
+            description: "El paraguas es un dispositivo usado para protegerse de la lluvia. Su origen se remonta a China, y es muy popular en Japón."
+        },
+        "BILLETES": {
+            hints: ["Forma de dinero portátil.", "Introducido por primera vez en China.", "Hecho de papel especial."],
+            image: "images/billetes.jpg",
+            description: "Los billetes son una forma de dinero portátil introducida en China. Se utilizan en todo el mundo como medio de pago."
+        },
+        "BRUJULA": {
+            hints: ["Herramienta para encontrar direcciones.", "Utiliza el campo magnético terrestre.", "Inventada en China."],
+            image: "images/brujula.jpg",
+            description: "La brújula es una herramienta usada para encontrar direcciones, basada en el magnetismo terrestre. Fue inventada en China."
+        },
+        "TE": {
+            hints: ["Bebida tradicional asiática.", "Se toma caliente o frío.", "Conocido por sus beneficios para la salud."],
+            image: "images/te.jpg",
+            description: "El té es una bebida tradicional, especialmente en Asia, conocida por sus beneficios para la salud y su capacidad para ser consumida caliente o fría."
+        },
+        "FUEGOS": {
+            hints: ["Espectáculo visual de luces en el cielo.", "Usa pólvora para explotar.", "Tradicional en festivales chinos."],
+            image: "images/fuegos.jpg",
+            description: "Los fuegos artificiales son explosivos que producen luces y sonidos. Se utilizan en celebraciones, especialmente en festivales chinos."
+        },
+        "SEDAS": {
+            hints: ["Tejido lujoso y suave.", "Producido por gusanos de seda.", "Importante en la Ruta de la Seda."],
+            image: "images/sedas.jpg",
+            description: "La seda es un tejido lujoso y suave producido por los gusanos de seda. Fue muy importante en la antigua Ruta de la Seda."
+        },
+        "ABACO": {
+            hints: ["Herramienta para cálculos matemáticos.", "Tiene cuentas móviles en varillas.", "Usada antes de las calculadoras."],
+            image: "images/abaco.jpg",
+            description: "El ábaco es una herramienta usada para realizar cálculos matemáticos. Consiste en cuentas móviles sobre varillas, utilizado antes de las calculadoras."
+        },
+        "PORCELANA": {
+            hints: ["Material cerámico fino.", "Usado en vajillas y decoraciones.", "Popularizado por China."],
+            image: "images/porcelana.jpg",
+            description: "La porcelana es un material cerámico fino, utilizado para fabricar vajillas y decoraciones. Fue popularizado por China."
+        },
+        "TINTE": {
+            hints: ["Sustancia líquida utilizada para teñir.", "Usado en ropa y textiles.", "Originado en China."],
+            image: "images/tinta.jpg",
+            description: "La tinta es una sustancia líquida utilizada para escribir o imprimir, compuesta de pigmentos y aceites. Fue inventada en China."
+        },
+        "LINTERNA": {
+            hints: ["Dispositivo para iluminación portátil.", "Utilizado en jardines y templos japoneses.", "Utilizado en emergencias."],
+            image: "images/linterna.jpg",
+            description: "Una linterna japonesa o tōrō es un elemento tradicional hecho de piedra, madera o metal. Se utilizaba históricamente para iluminar caminos en templos, jardines y santuarios, combinando funcionalidad con un simbolismo espiritual."
+        },
+        "CERBATANA": {
+            hints: ["Instrumento usado para lanzar proyectiles.", "Puede ser utilizado en la caza.", "Originado en Asia y otras regiones tropicales."],
+            image: "images/cerbatana.jpg",
+            description: "La cerbatana es un tubo largo utilizado para lanzar pequeños proyectiles, como dardos o semillas. Originada en Asia y regiones tropicales, ha sido empleada tradicionalmente para la caza y, en ocasiones, como herramienta ceremonial."
+        },
+        "KIMONO": {
+            hints: ["Vestimenta tradicional japonesa.", "Hecho de seda o algodón.", "Usado en ceremonias formales."],
+            image: "images/kimono.jpg",
+            description: "El kimono es una prenda tradicional japonesa, hecha generalmente de seda o algodón, y utilizada en ceremonias formales o festividades."
+        },
+        "ORIGAMI": {
+            hints: ["Arte de doblar papel.", "Tradición japonesa.", "Forma figuras como grullas o flores."],
+            image: "images/origami.jpg",
+            description: "El origami es un arte tradicional japonés que consiste en doblar papel para crear figuras como grullas, flores y otros objetos decorativos."
+        },
+        "CALIGRAFIA": {
+            hints: ["Arte de escribir con estilo.", "Utilizada en China y Japón.", "Usada en cartas y documentos importantes."],
+            image: "images/caligrafia.jpg",
+            description: "La caligrafía es el arte de escribir de forma estilizada, y es una tradición en China y Japón, utilizada en documentos importantes y obras artísticas."
+        },
+        "SISMOGRAFO": {
+            hints: ["Instrumento para medir terremotos.", "Utiliza vibraciones sísmicas.", "Desarrollado en el siglo XX."],
+            image: "images/sismografo.jpg",
+            description: "El sismógrafo es un dispositivo utilizado para medir la intensidad y la duración de los terremotos, registrando las vibraciones sísmicas en la Tierra."
+        },
+        "COMETA": {
+            hints: ["Objeto que vuela con viento.", "Tiene una cola larga.", "Popular en festivales."],
+            image: "images/cometa.jpg",
+            description: "La cometa es un objeto que vuela en el aire, sostenido por un hilo, y es popular en festivales, especialmente en Asia."
+        }
+        };
+
+
+        let selectedWord = '';
+        let wordArray = [];
+        let guessedLetters = [];
+        let attempts = 6;
+        let wordDescription = '';
+        let resultImage = '';
+        let availableWords = Object.keys(words); // Lista de palabras disponibles
+
+
+        function getRandomWord() {
+    // Si ya no hay palabras disponibles, reinicia la lista
+    if (availableWords.length === 0) {
+        availableWords = Object.keys(words);  // Vuelve a cargar todas las palabras
+    }
+
+    // Selecciona una palabra aleatoria y la elimina de la lista
+    const randomIndex = Math.floor(Math.random() * availableWords.length);
+    selectedWord = availableWords.splice(randomIndex, 1)[0];  // Elimina la palabra seleccionada
+
+    // Inicializa las variables del juego
+    wordArray = Array(selectedWord.length).fill('_');  // Prepara la palabra con guiones
+    guessedLetters = [];
+    attempts = 6;
+    wordDescription = words[selectedWord].description;
+    resultImage = words[selectedWord].image;
+
+    updateUI();
+}
+
+function nextWord() {
+    // Ocultar la imagen, la descripción y el mensaje de victoria o derrota
+    document.getElementById('description').style.display = 'none';
+    document.getElementById('resultImage').style.display = 'none';
+    document.getElementById('message').textContent = '';  // Limpiar el mensaje
+
+    // Si ya no hay palabras disponibles, reinicia la lista
+    if (availableWords.length === 0) {
+        availableWords = Object.keys(words);  // Vuelve a cargar todas las palabras
+        alert("¡Se han agotado las palabras! Se reinicia el juego.");
+    }
+
+    // Selecciona una palabra aleatoria y la elimina de la lista
+    const randomIndex = Math.floor(Math.random() * availableWords.length);
+    selectedWord = availableWords.splice(randomIndex, 1)[0];  // Elimina la palabra seleccionada
+
+    // Inicializa las variables del juego
+    wordArray = Array(selectedWord.length).fill('_');  // Prepara la palabra con guiones
+    guessedLetters = [];
+    attempts = 6;
+    wordDescription = words[selectedWord].description;
+    resultImage = words[selectedWord].image;
+
+    updateUI();
+}
+
+
+
+function guessLetter() {
+    const letter = document.getElementById('letterInput').value.toUpperCase();
+    if (letter === '' || guessedLetters.includes(letter)) return;  // Evitar letras vacías o repetidas
+
+    guessedLetters.push(letter);
+    let found = false;
+
+    for (let i = 0; i < selectedWord.length; i++) {
+        if (selectedWord[i] === letter) {
+            wordArray[i] = letter;  // Actualiza el arreglo de la palabra con la letra adivinada
+            found = true;
+        }
+    }
+
+    if (!found) {
+        attempts--;  // Reduce los intentos si la letra no es correcta
+    }
+
+    document.getElementById('letterInput').value = '';  // Limpia el campo de entrada
+    updateUI();
+}
+
+function updateUI() {
+    document.getElementById('word').textContent = wordArray.join(' ');
+    document.getElementById('attempts').textContent = `Intentos restantes: ${attempts}`;
+    document.getElementById('hint').textContent = `Pista: ${words[selectedWord].hints.join(', ')}`;
+
+    if (attempts <= 0) {
+        document.getElementById('message').textContent = '¡Has perdido! La palabra era: ' + selectedWord;
+        document.getElementById('descriptionText').textContent = wordDescription;
+        document.getElementById('description').style.display = 'block';
+        document.getElementById('resultImage').src = resultImage;
+        document.getElementById('resultImage').style.display = 'block';
+    } else if (!wordArray.includes('_')) {
+        document.getElementById('message').textContent = '¡Has ganado! La palabra es: ' + selectedWord;
+        document.getElementById('descriptionText').textContent = wordDescription;
+        document.getElementById('description').style.display = 'block';
+        document.getElementById('resultImage').src = resultImage;
+        document.getElementById('resultImage').style.display = 'block';
+    }
+}
+
+function resetGame() {
+    nextWord();  // Llama a nextWord() en lugar de getRandomWord()
+    document.getElementById('description').style.display = 'none';
+    document.getElementById('resultImage').style.display = 'none';
+    document.getElementById('message').textContent = '';
+}
+
+
+        // Initialize game on page load
+        getRandomWord();
+    </script>
+</body>
+</html>
+
